@@ -5,9 +5,7 @@ Project information is in its respective folder.
 
 This project is for learning purposes only.
 
-(Currently incomplete will add more parts soon)
-
-Grammar used for this project:
+(Currently incomplete will add more parts soon...)
 
 The syntax
 ----------
