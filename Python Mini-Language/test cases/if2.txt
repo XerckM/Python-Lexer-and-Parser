@@ -1,0 +1,3 @@
+program condtional2 :
+  if 3<3 then print false fi
+end

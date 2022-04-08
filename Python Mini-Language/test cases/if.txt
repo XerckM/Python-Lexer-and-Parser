@@ -1,0 +1,5 @@
+program condtional:
+  if 3 < 3 then
+    print false
+  fi
+end

@@ -1,0 +1,17 @@
+ // This program should print the number 20.
+program Twenty2:
+  int a;
+  int b;
+  a : = 2;
+  b := 1;
+  if not (a < 0) then
+    int b;
+    b := - 2;     //     (the inner b, the outer one is still 1)
+    a := a * b    // a = -4
+  else
+    int c;
+    c := a - b;
+    a := a * (c - b)
+  fi;
+  print a * (a - b)    // -4 * (-4 - 1)  =  -4 * (-5)  =  20
+end

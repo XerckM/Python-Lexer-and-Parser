@@ -1,0 +1,79 @@
+The syntax
+----------
+
+Program  =  "program"  Identifier  ":"  Body  "end" .
+
+Body  =  [ Declarations ]  Statements .
+
+Declarations  =  Declaration { Declaration } .
+
+Declaration  =  ( "bool" | "int" )  Identifier ";" .
+
+Statements  =  Statement { ";" Statement } .
+
+Statement  =  AssignmentStatement
+           |  ConditionalStatement
+           |  IterativeStatement
+           |  PrintStatement .
+
+AssignmentStatement  =  Identifier ":=" Expression .
+
+ConditionalStatement  =  "if"  Expression
+                         "then"  Body
+                         [ "else" Body ]
+                         "fi" .
+
+IterativeStatement  =  "while"  Expression  "do"  Body  "od" .
+
+PrintStatement  =  "print"  Expression .
+
+Expression  =  SimpleExpression [ RelationalOperator SimpleExpression ] .
+
+RelationalOperator  =  "<" | "=<" | "=" | "!=" | ">=" | ">" .
+
+SimpleExpression  =  Term { AdditiveOperator Term } .
+
+AdditiveOperator  =  "+" | "-" | "or" .
+
+Term  =  Factor { MultiplicativeOperator Factor } .
+
+MultiplicativeOperator  =  "*" | "/" | "and" .
+
+Factor  =  [ UnaryOperator ] ( Literal  |  Identifier  | "(" Expression ")" ) .
+
+UnaryOperator  =  "-" | "not" .
+
+
+Literal  =  BooleanLiteral  |  IntegerLiteral .
+
+BooleanLiteral  =  "false"  |  "true" .
+
+IntegerLiteral  =  Digit { Digit } .
+
+Identifier  =  Letter { Letter | Digit | "_" }.
+
+Digit  =  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
+
+Letter  = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k"
+        | "l" | "m" | "n" | "o" | "p" | "q" | "u" | "r" | "s" | "t" | "u"
+        | "v" | "w" | "x" | "y" | "z"
+        | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K"
+        | "L" | "M" | "N" | "O" | "P" | "Q" | "U" | "R" | "S" | "T" | "U"
+        | "V" | "W" | "X" | "Y" | "Z" .
+
+
+Comments:
+--------
+
+0.  Integer literals and identifiers are treated as terminal symbols.
+
+1.  White space is allowed anywhere, except within terminal symbols.
+
+1.  A comment begins with a double slash ("//") and terminates at the end of
+    the line.
+
+2.  "Maximum munch" applies. For example, "if1" is an identifier, not an "if"
+    followed by a "1".
+
+3.  The scope of a variable is from its declaration to the end of the nearest
+    enclosing body.  Standard rules for hiding apply.

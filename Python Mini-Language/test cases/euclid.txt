@@ -1,0 +1,13 @@
+// Euclid's algorithm for the greatest common divisor.
+program GCD:
+   int a;  int b;
+   a := 15;
+   b := 20;
+   print a;  print b;
+   while a != b do
+      if a < b then b := b - a
+      else a := a - b
+      fi
+   od;
+   print a
+end
