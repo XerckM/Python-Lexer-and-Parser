@@ -36,14 +36,6 @@ class Lexer:
         self.pos = 0
         self.token = None
 
-    @staticmethod
-    def is_alphabet(char):
-        """
-        This function returns a boolean value if the character
-        is a letter
-        """
-        return ('A' <= char <= 'Z') or ('a' <= char <= 'z')
-
     def begin_scan(self):
         """
         This function scans the next character by skipping
@@ -94,9 +86,9 @@ class Lexer:
             # a digit or underscore '_' and concatenates it in a variable
             # if word is not in keywords it is returned as an Identifier else
             # it returns as a token with a type of itself
-            if self.is_alphabet(peek):
+            if peek.isalpha():
                 word = ''
-                while self.is_alphabet(peek) or peek == '_' or peek.isdigit():
+                while peek.isalpha() or peek == '_' or peek.isdigit():
                     word += peek
                     peek = self.next_char()
                 self.idx -= 1
