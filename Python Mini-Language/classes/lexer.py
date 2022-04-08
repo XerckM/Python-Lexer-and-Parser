@@ -2,17 +2,6 @@
 from classes.token import Token
 from classes.error import IllegalCharacterError
 
-##########################
-# CONSTANTS
-##########################
-
-keywords = ['program', 'int', 'print', 'if',
-            'then', 'else', 'while', 'do',
-            'od', 'fi', 'bool', 'end', 'true',
-            'false', 'or', 'and', 'not']
-single_char_special = [';', '(', ')', '{', '}', '+', '-', '*', '=']
-
-
 ###########################
 # LEXER CLASS
 ###########################
@@ -29,12 +18,25 @@ The actual purpose of this class is to return tokens from the input file.
 
 
 class Lexer:
+
+    KEYWORDS = ['program', 'int', 'print', 'if',
+                'then', 'else', 'while', 'do',
+                'od', 'fi', 'bool', 'end', 'true',
+                'false', 'or', 'and', 'not']
+    SINGLE_CHAR = [';', '(', ')', '{', '}', '+', '-', '*', '=']
+
     def __init__(self, text):
         self.text = text
         self.idx = -1
         self.line = 1
         self.pos = 0
+        self.reserved = dict()
+        self.reserve()
         self.token = None
+
+    def reserve(self):
+        for key in Lexer.KEYWORDS:
+            self.reserved[key] = Token(key, self.line, self.pos, key)
 
     def begin_scan(self):
         """
@@ -93,9 +95,8 @@ class Lexer:
                     peek = self.next_char()
                 self.idx -= 1
                 self.pos -= 1
-                if word not in keywords:
+                if self.reserved.get(word) is None:
                     self.token = Token('ID', self.line, self.pos - len(word), word)
-
                 else:
                     self.token = Token(word, self.line, self.pos - len(word), word)
 
@@ -112,7 +113,7 @@ class Lexer:
                 self.token = Token('NUM', self.line, self.pos - digits, num)
 
             # OTHER ALLOWED CHARACTERS
-            elif peek in single_char_special:
+            elif peek in Lexer.SINGLE_CHAR:
                 self.token = Token(peek, self.line, self.pos - 1, peek)
 
             # ASSIGN CHARACTER OR COLON
