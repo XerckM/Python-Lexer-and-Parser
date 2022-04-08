@@ -94,7 +94,6 @@ class Lexer:
             # a digit or underscore '_' and concatenates it in a variable
             # if word is not in keywords it is returned as an Identifier else
             # it returns as a token with a type of itself
-
             if self.is_alphabet(peek):
                 word = ''
                 while self.is_alphabet(peek) or peek == '_' or peek.isdigit():
