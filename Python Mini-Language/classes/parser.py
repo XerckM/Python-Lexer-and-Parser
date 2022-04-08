@@ -5,7 +5,7 @@ from classes.error import IllegalSyntaxError
 # PARSER
 ######################
 
-
+# (Needs more lines of codes...)
 class Parser:
     def __init__(self, text):
         self.lex = Lexer(text)
