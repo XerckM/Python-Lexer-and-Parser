@@ -23,85 +23,55 @@ class Lexer:
                 'then', 'else', 'while', 'do',
                 'od', 'fi', 'bool', 'end', 'true',
                 'false', 'or', 'and', 'not']
-    SINGLE_CHAR = [';', '(', ')', '{', '}', '+', '-', '*', '=']
 
     def __init__(self, text):
         self.text = text
         self.idx = -1
         self.line = 1
         self.pos = 0
-        self.reserved = dict()
-        self.reserve()
         self.token = None
-
-    def reserve(self):
-        for key in Lexer.KEYWORDS:
-            self.reserved[key] = Token(key, self.line, self.pos, key)
-
-    def begin_scan(self):
-        """
-        This function scans the next character by skipping
-        all space, tabs, and newline characters
-        """
-        self.idx += 1
-
-        while self.idx < len(self.text) and self.text[self.idx].isspace() or \
-                self.text[self.idx] == '\t' or self.text[self.idx] == '\n':
-            if self.text[self.idx] == '\n':
-                self.line += 1
-                self.pos = 0
-            else:
-                self.pos += 1
-            self.idx += 1
-
-        self.pos += 1
-        return '\0' if self.idx == len(self.text) else self.text[self.idx]
 
     def next_char(self):
         """
         This function simply returns the next character in
-        the text whatever character it is
+        the text.
+
+        If self.idx is equal to the length of text it returns 'EOF'
+        which will be a token as an end of file.
         """
         self.idx += 1
-        self. pos += 1
-        return '\0' if self.idx == len(self.text) else self.text[self.idx]
+        self.pos += 1
+        if self.idx == len(self.text):
+            return 'EOF'
+        return self.text[self.idx]
 
     def next(self):
         """
         This function is used to find the next lexeme in the
-        text.
+        text and returns a Token class with its attributes.
 
         (next() is called to find next lexeme as per requirements)
 
-        It returns a class of Token with its attributes.
-
-        Error is handled by the Error class if there
-        are any characters detected which are not allowed
-        or encoded in this function. It stops looking for tokens
+        Returns an error if there are any characters detected which 
+        are not allowed or encoded in this function. It stops looking for tokens
         once an invalid character is found.
         """
-
-        try:
-            peek = self.begin_scan()
-
-            # Checks for characters that start with a letter and has
-            # a digit or underscore '_' and concatenates it in a variable
-            # if word is not in keywords it is returned as an Identifier else
-            # it returns as a token with a type of itself
-            if peek.isalpha():
+        peek = self.next_char()
+        match peek:
+            case peek if peek.isalpha() and peek != 'EOF':
                 word = ''
                 while peek.isalpha() or peek == '_' or peek.isdigit():
                     word += peek
                     peek = self.next_char()
+                    if peek == 'EOF':
+                        break
                 self.idx -= 1
                 self.pos -= 1
-                if self.reserved.get(word) is None:
+                if word not in Lexer.KEYWORDS:
                     self.token = Token('ID', self.line, self.pos - len(word), word)
                 else:
                     self.token = Token(word, self.line, self.pos - len(word), word)
-
-            # Checks for characters that start with a number
-            elif peek.isdigit():
+            case peek if peek.isdigit():
                 num = 0
                 digits = 0
                 while peek.isdigit():
@@ -111,58 +81,7 @@ class Lexer:
                 self.idx -= 1
                 self.pos -= 1
                 self.token = Token('NUM', self.line, self.pos - digits, num)
-
-            # OTHER ALLOWED CHARACTERS
-            elif peek in Lexer.SINGLE_CHAR:
-                self.token = Token(peek, self.line, self.pos - 1, peek)
-
-            # ASSIGN CHARACTER OR COLON
-            elif peek == ':':
-                peek = self.next_char()
-                if peek == '=':
-                    self.token = Token(':=', self.line, self.pos - 2, ':=')
-                else:
-                    self.idx -= 1
-                    self.pos -= 1
-                    self.token = Token(':', self.line, self.pos - 1, ':')
-
-            # GREATER THAN OR EQUAL TO or GREATER THAN CHARACTER
-            elif peek == '>':
-                peek = self.next_char()
-                if peek == '=':
-                    self.token = Token('>=', self.line, self.pos - 2, '>=')
-                else:
-                    self.idx -= 1
-                    self.pos -= 1
-                    self.token = Token('>', self.line, self.pos - 1, '>')
-
-            # LESS THAN OR EQUAL TO or LESS THAN CHARACTER
-            elif peek == '<':
-                peek = self.next_char()
-                if peek == '=':
-                    self.token = Token('<=', self.line, self.pos - 2, '<=')
-                else:
-                    self.idx -= 1
-                    self.pos -= 1
-                    self.token = Token('<', self.line, self.pos - 1, '<')
-
-            # NOT EQUAL TO
-            # Error found if character is '!' as it is not an accepted character
-            elif peek == '!':
-                peek = self.next_char()
-                if peek == '=':
-                    self.token = Token('!=', self.line, self.pos - 2, '!=')
-                else:
-                    self.idx -= 1
-                    self.pos -= 1
-                    self.token = Token('end-of-text', self.line, self.pos - 1, 'end-of-text')
-                    print(f'\nError at <(Line: {self.line}, Pos: {self.pos - 1}),',
-                          IllegalCharacterError("'!'>"))
-
-            # COMMENT HANDLING SECTION
-            # This section handles ignoring the rest of the characters found after '//'
-            # If the character is just '/' return it as a token with a kind of itself
-            elif peek == '/':
+            case '/':
                 peek = self.next_char()
                 str_len = 0
                 if peek == '/':
@@ -171,23 +90,67 @@ class Lexer:
                         peek = self.next_char()
                     self.idx -= 1
                     self.pos -= 1
-                    self.token = Token('//', self.line, self.pos - str_len - 1, '//')
+                    self.token = Token('COMMENT', self.line, self.pos - str_len - 1, '//')
                 else:
                     self.idx -= 1
                     self.pos -= 1
                     self.token = Token('/', self.line, self.pos - 1, '/')
-
-            # Catches illegal characters not handled in the whole function
-            # Prints an error along with its line number and position as well
-            # as the value of the character
-            else:
-                self.token = Token('end-of-text', self.line, self.pos - 1, 'end-of-text')
+            case ':':
+                peek = self.next_char()
+                if peek == '=':
+                    self.token = Token(':=', self.line, self.pos - 2, ':=')
+                else:
+                    self.idx -= 1
+                    self.pos -= 1
+                    self.token = Token(':', self.line, self.pos - 1, ':')
+            case '>':
+                peek = self.next_char()
+                if peek == '=':
+                    self.token = Token('>=', self.line, self.pos - 2, '>=')
+                else:
+                    self.idx -= 1
+                    self.pos -= 1
+                    self.token = Token('>', self.line, self.pos - 1, '>')
+            case '<':
+                peek = self.next_char()
+                if peek == '=':
+                    self.token = Token('<=', self.line, self.pos - 2, '<=')
+                else:
+                    self.idx -= 1
+                    self.pos -= 1
+                    self.token = Token('<', self.line, self.pos - 1, '<')
+            case '!':
+                peek = self.next_char()
+                if peek == '=':
+                    self.token = Token('!=', self.line, self.pos - 2, '!=')
+                else:
+                    print(f'\nError at <(Line: {self.line}, Pos: {self.pos - 2}),', IllegalCharacterError("'!'>"))
+                    self.token = Token('EOF', self.line, self.pos - 1, 'EOF')
+            case ';':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case '(':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case ')':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case '+':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case '-':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case '*':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case '=':
+                self.token = Token(peek, self.line, self.pos - 1, peek)
+            case '\n':
+                self.line += 1
+                self.pos = 0
+                return self.next()
+            case peek if peek.isspace():
+                return self.next()
+            case 'EOF':
+                self.token = Token('EOF', self.line, self.pos - 1, 'EOF')
+            case _:
                 print(f'\nError at <(Line: {self.line}, Pos: {self.pos - 1}),',
                       IllegalCharacterError("'" + peek + "'>"))
-
-        # Handles IndexError from begin_scan() function
-        # (Not an issue in returning tokens but may need fixing in the future)
-        except IndexError:
-            self.token = Token('end-of-text', self.line, self.pos - 1, 'end-of-text')
+                self.token = Token('EOF', self.line, self.pos - 1, 'EOF')
 
         return self.token
