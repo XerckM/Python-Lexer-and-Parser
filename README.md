@@ -5,6 +5,8 @@ Project information is in its respective folder.
 
 This project is for learning purposes only.
 
+Project is written in Python 3.10 (to work with match case)
+
 (Currently incomplete will add more parts soon...)
 
 The syntax
