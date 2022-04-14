@@ -84,7 +84,14 @@ class Parser:
         if self.token.kind() == 'else':
             self.token = self.lex.next()
             self.body()
+        prev_token = self.token
         self.match('fi')
+        temp_token = self.token
+        if self.token.kind == ';':
+            self.token = temp_token
+        else:
+            raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 2}). '
+                            f'Expected ";" but none found.')
 
     def expr(self):
         self.simple_expr()
@@ -155,7 +162,14 @@ class Parser:
         self.expr()
         self.match('do')
         self.body()
+        prev_token = self.token
         self.match('od')
+        temp_token = self.token
+        if self.token.kind == ';':
+            self.token = temp_token
+        else:
+            raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 2}). '
+                            f'Expected ";" but none found.')
 
     def print_statement(self):
         if self.token.kind() == 'print':
