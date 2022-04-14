@@ -9,24 +9,24 @@ class Parser:
     def __init__(self, text):
         self.lex = Lexer(text)
         self.token = self.lex.next()
-        self.ast = dict()
-
-    def parse(self):
-        return self.program
 
     def match(self, value):
         if self.token.kind() == value:
             self.token = self.lex.next()
         else:
-            raise Exception(f'At {self.token.position()} I see "{self.token.kind()}" but expected "{value}"')
+            raise Exception(f'<At {self.token.position()} I see "{self.token.kind()}" but expected "{value}">')
 
     def program(self):
-        self.match('program')
-        self.match('ID')
-        self.match(':')
-        self.body()
-        self.match('end')
-        return True
+        try:
+            self.match('program')
+            self.match('ID')
+            self.match(':')
+            self.body()
+            self.match('end')
+            return True
+        except BaseException as err:
+            print(f'\n{err}')
+            return False
 
     def body(self):
         if self.token.kind() in ('bool', 'int'):
@@ -40,9 +40,9 @@ class Parser:
 
     def declaration(self):
         assert self.token.kind() in ('bool', 'int'), \
-            f'ERROR! at {self.token.position()}. ' \
+            f'<ERROR! at {self.token.position()}. ' \
             f'Expected "bool" or "int" instead' \
-            f'found {self.token.kind()}'
+            f'found {self.token.kind()}>'
         self.token = self.lex.next()
         self.match('ID')
         self.match(';')
@@ -68,10 +68,10 @@ class Parser:
     def expected(self, type_list):
         if self.token.kind() not in type_list:
             raise Exception(
-                f'ERROR! at {self.token.position()}. Expected to see {type_list}, but see {self.token.kind()}')
+                f'<ERROR! at {self.token.position()}. Expected to see {type_list}, but see "{self.token.kind()}">')
 
     def assignment_statement(self):
-        assert self.token.kind() == 'ID', f'Expected "ID" instead found {self.token.kind()}'
+        assert self.token.kind() == 'ID', f'<Expected "ID" instead found {self.token.kind()}>'
         self.match('ID')
         self.match(':=')
         self.expr()
@@ -111,21 +111,35 @@ class Parser:
         if self.token.kind() in ('true', 'false', 'NUM'):
             self.literal()
         elif self.token.kind() == 'ID':
-            self.token = self.lex.next()
+            prev_token = self.token
+            temp_token = self.lex.next()
+            if temp_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
+                                     '+', '-', 'or', '*', '/', 'and', ')', 'else'):
+                self.token = temp_token
+            else:
+                raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 1}). '
+                                f'Expected ";" but none found.')
         elif self.token.kind() == '(':
             self.token = self.lex.next()
             self.expr()
             self.match(')')
         else:
-            self.expected(['true', 'false', 'NUM', 'ID', ')'])
+            self.expected(['true', 'false', 'NUM', 'ID', '('])
 
     def literal(self):
         assert self.token.kind() in ('true', 'false', 'NUM'), \
-            f'ERROR! at {self.token.position()}.' \
+            f'<ERROR! at {self.token.position()}.' \
             f'Expected "true" or "false" or "NUM" instead' \
-            f'found {self.token.kind()}'
+            f'found {self.token.kind()}>'
         if self.token.kind() == 'NUM':
-            self.token = self.lex.next()
+            prev_token = self.token
+            temp_token = self.lex.next()
+            if temp_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
+                                     '+', '-', 'or', '*', '/', 'and', ')'):
+                self.token = temp_token
+            else:
+                raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 1}). '
+                                f'Expected ";" but none found.')
         else:
             self.boolean_literal()
 
@@ -133,14 +147,15 @@ class Parser:
         if self.token.kind() in ('true ', 'false'):
             self.token = self.lex.next()
         else:
-            raise Exception(f'ERROR! at {self.token.position()}. At position Expected "true" or "false" or "NUM" '
-                            f'instead found {self.token.kind()}')
+            raise Exception(f'<ERROR! at {self.token.position()}. Expected "true" or "false" or "NUM" '
+                            f'instead found {self.token.kind()}>')
 
     def iterative_statement(self):
         self.match('while')
         self.expr()
         self.match('do')
         self.body()
+        self.match('od')
 
     def print_statement(self):
         if self.token.kind() == 'print':
