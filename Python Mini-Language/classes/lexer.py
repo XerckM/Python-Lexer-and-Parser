@@ -6,18 +6,17 @@ from classes.error import IllegalCharacterError
 # LEXER CLASS
 ###########################
 
-"""
-This class represents a Lexer object.
-
-Most functions in this class is mainly used for the next() function
-
-Following the requirements, libraries like 're' are not allowed.
-
-The purpose of this class is to return tokens from the input file.
-"""
-
 
 class Lexer:
+    """
+    This class represents a Lexer object.
+
+    Most functions in this class is mainly used for the next() function
+
+    Following the requirements, libraries like 're' are not allowed.
+
+    The purpose of this class is to return tokens from the input file.
+    """
 
     KEYWORDS = frozenset(['program', 'int', 'print', 'if',
                           'then', 'else', 'while', 'do',
@@ -155,12 +154,3 @@ class Lexer:
                 self.token = Token('EOF', self.line, self.pos - 1, 'EOF')
 
         return self.token
-
-    def kind(self):
-        return self.token.kind()
-
-    def position(self):
-        return self.token.position()
-
-    def value(self):
-        return self.token.value()
