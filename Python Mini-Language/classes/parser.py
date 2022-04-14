@@ -86,9 +86,9 @@ class Parser:
             self.body()
         prev_token = self.token
         self.match('fi')
-        temp_token = self.token
-        if self.token.kind == ';':
-            self.token = temp_token
+        next_token = self.token
+        if next_token.kind() == ';':
+            self.token = next_token
         else:
             raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 2}). '
                             f'Expected ";" but none found.')
@@ -119,10 +119,11 @@ class Parser:
             self.literal()
         elif self.token.kind() == 'ID':
             prev_token = self.token
-            temp_token = self.lex.next()
-            if temp_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
-                                     '+', '-', 'or', '*', '/', 'and', ')', 'else'):
-                self.token = temp_token
+            next_token = self.lex.next()
+            if next_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
+                                     '+', '-', 'or', '*', '/', 'and', ')',
+                                     'else', 'do', 'od', 'fi'):
+                self.token = next_token
             else:
                 raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 1}). '
                                 f'Expected ";" but none found.')
@@ -140,10 +141,11 @@ class Parser:
             f'found {self.token.kind()}>'
         if self.token.kind() == 'NUM':
             prev_token = self.token
-            temp_token = self.lex.next()
-            if temp_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
-                                     '+', '-', 'or', '*', '/', 'and', ')'):
-                self.token = temp_token
+            next_token = self.lex.next()
+            if next_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
+                                     '+', '-', 'or', '*', '/', 'and', ')',
+                                     'do', 'od', 'fi'):
+                self.token = next_token
             else:
                 raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 1}). '
                                 f'Expected ";" but none found.')
@@ -164,9 +166,9 @@ class Parser:
         self.body()
         prev_token = self.token
         self.match('od')
-        temp_token = self.token
-        if self.token.kind == ';':
-            self.token = temp_token
+        next_token = self.token
+        if next_token.kind() == ';':
+            self.token = next_token
         else:
             raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 2}). '
                             f'Expected ";" but none found.')
