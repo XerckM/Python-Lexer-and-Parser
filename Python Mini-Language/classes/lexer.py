@@ -13,16 +13,16 @@ Most functions in this class is mainly used for the next() function
 
 Following the requirements, libraries like 're' are not allowed.
 
-The actual purpose of this class is to return tokens from the input file.
+The purpose of this class is to return tokens from the input file.
 """
 
 
 class Lexer:
 
-    KEYWORDS = ['program', 'int', 'print', 'if',
-                'then', 'else', 'while', 'do',
-                'od', 'fi', 'bool', 'end', 'true',
-                'false', 'or', 'and', 'not']
+    KEYWORDS = frozenset(['program', 'int', 'print', 'if',
+                          'then', 'else', 'while', 'do',
+                          'od', 'fi', 'bool', 'end', 'true',
+                          'false', 'or', 'and', 'not'])
 
     def __init__(self, text):
         self.text = text
@@ -52,7 +52,7 @@ class Lexer:
 
         (next() is called to find next lexeme as per requirements)
 
-        Returns an error if there are any characters detected which 
+        Returns an error if there are any characters detected which
         are not allowed or encoded in this function. It stops looking for tokens
         once an invalid character is found.
         """
@@ -90,7 +90,7 @@ class Lexer:
                         peek = self.next_char()
                     self.idx -= 1
                     self.pos -= 1
-                    self.token = Token('COMMENT', self.line, self.pos - str_len - 1, '//')
+                    self.next()
                 else:
                     self.idx -= 1
                     self.pos -= 1
@@ -124,7 +124,8 @@ class Lexer:
                 if peek == '=':
                     self.token = Token('!=', self.line, self.pos - 2, '!=')
                 else:
-                    print(f'\nError at <(Line: {self.line}, Pos: {self.pos - 2}),', IllegalCharacterError("'!'>"))
+                    print(f'\nError at <(Line: {self.line}, Pos: {self.pos - 2}),',
+                          IllegalCharacterError("'!'>"))
                     self.token = Token('EOF', self.line, self.pos - 1, 'EOF')
             case ';':
                 self.token = Token(peek, self.line, self.pos - 1, peek)
@@ -154,3 +155,12 @@ class Lexer:
                 self.token = Token('EOF', self.line, self.pos - 1, 'EOF')
 
         return self.token
+
+    def kind(self):
+        return self.token.kind()
+
+    def position(self):
+        return self.token.position()
+
+    def value(self):
+        return self.token.value()
