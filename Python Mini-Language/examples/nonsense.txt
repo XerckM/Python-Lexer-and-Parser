@@ -1,0 +1,13 @@
+program lexicallyOk :
+   intt a;
+   int b;
+   a :== 2;
+   b := 5;
+   while (a != b) do not print else do
+     int b;
+     b := 2 *** a;
+     print b;
+     a := a + 1
+   od;
+   print b
+end
