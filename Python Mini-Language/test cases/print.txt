@@ -1,3 +1,0 @@
-program Print:
-  print(77)
-end
