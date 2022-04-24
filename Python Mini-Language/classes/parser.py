@@ -47,8 +47,7 @@ class Parser:
             ast.append(self.match(':'))
             ast.append(self.body())
             ast.append(self.match('end'))
-            print(ast)
-            return f'\n{True}'
+            return f'\n{ast}\n\n{True}'
         except BaseException as err:
             print(f'\n{err}')
             return f'\n{False}'
