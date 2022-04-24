@@ -12,16 +12,11 @@ class Parser:
 
     Comments are not tokenized in the lexer to simplify the process. That way '//'
     and anything after the symbol is already ignored and will not be parsed.
-
-    (Still needs an AST)
     """
 
     def __init__(self, lexer):
         self.lex = lexer
-        self.token = self.lex.next()    # initializing first token
-
-    def parse(self):
-        pass
+        self.token = self.lex.next()  # initializing first token
 
     def match(self, value):
         """
@@ -30,8 +25,13 @@ class Parser:
         otherwise it will raise an error with the position and type of token that
         should have been expected.
         """
+        scaffold = {}
         if self.token.kind() == value:
+            scaffold['type'] = self.token.type_
+            scaffold['position'] = self.token.position_
+            scaffold['value'] = self.token.value_
             self.token = self.lex.next()
+            return scaffold
         else:
             raise Exception(f'<At {self.token.position()} I see "{self.token.kind()}" but expected "{value}">')
 
@@ -40,12 +40,14 @@ class Parser:
         Program  =  "program"  Identifier  ":"  Body  "end"
         Identifier  =  Letter { Letter | Digit | "_" } <--handled by lexer
         """
+        ast = []
         try:
-            self.match('program')
-            self.match('ID')
-            self.match(':')
-            self.body()
-            self.match('end')
+            ast.append(self.match('program'))
+            ast.append(self.match('ID'))
+            ast.append(self.match(':'))
+            ast.append(self.body())
+            ast.append(self.match('end'))
+            print(ast)
             return f'\n{True}'
         except BaseException as err:
             print(f'\n{err}')
@@ -55,38 +57,62 @@ class Parser:
         """
         Body  =  [ Declarations ]  Statements
         """
+        values = []
         if self.token.kind() in ('bool', 'int'):
-            self.declarations()
-        self.statements()
+            values.append({
+                'type': "Body",
+                'value': self.declarations()
+            })
+        values.append({
+            'type': "Body",
+            'value': self.statements()
+        })
+
+        return values
 
     def declarations(self):
         """
         Declarations  =  Declaration { Declaration }
         """
-        self.declaration()
+        values = []
+        values.append(self.declaration())
         while self.token.kind() in ('bool', 'int'):
-            self.declaration()
+            values.append(self.declaration())
+
+        return values
 
     def declaration(self):
         """
         Declaration  =  ( "bool" | "int" )  Identifier ";"
         """
+        values = []
         assert self.token.kind() in ('bool', 'int'), \
             f'<ERROR! at {self.token.position()}. ' \
             f'Expected "bool" or "int" instead' \
             f'found {self.token.kind()}>'
+        scaffold = {
+            "type": self.token.type_,
+            "position": self.token.position_,
+            "value": self.token.value_
+        }
+        values.append(scaffold)
         self.token = self.lex.next()
-        self.match('ID')
-        self.match(';')
+        values.append(self.match('ID'))
+        values.append(self.match(';'))
+
+        return values
 
     def statements(self):
         """
         Statements  =  Statement { ";" Statement }
         """
-        self.statement()
+        values = []
+        values.append(self.statement())
         while self.token.kind() == ';':
             self.token = self.lex.next()
-            self.statement()
+            values.append(self.statement())
+
+        return values
 
     def statement(self):
         """
@@ -95,16 +121,30 @@ class Parser:
                    |  IterativeStatement
                    |  PrintStatement
         """
+        scaffold = {}
         if self.token.kind() == 'ID':
-            self.assignment_statement()
+            scaffold = {
+                'type': 'Assignment Statement',
+                'value': self.assignment_statement(),
+            }
         elif self.token.kind() == 'if':
-            self.conditional_statement()
+            scaffold = {
+                'type': 'Conditional Statement',
+                'value': self.conditional_statement(),
+            }
         elif self.token.kind() == 'while':
-            self.iterative_statement()
+            scaffold = {
+                'type': 'Iterative Statement',
+                'value': self.iterative_statement(),
+            }
         elif self.token.kind() == 'print':
-            self.print_statement()
+            scaffold = {
+                'type': 'Print Statement',
+                'value': self.print_statement(),
+            }
         else:
-            self.expected(('if', 'ID', 'while', 'print'))   # Error is raised here
+            self.expected(('if', 'ID', 'while', 'print'))  # Error is raised here
+        return scaffold
 
     def expected(self, type_list):
         """
@@ -120,140 +160,185 @@ class Parser:
         """
         AssignmentStatement  =  Identifier ":=" Expression
         """
+        values = []
         assert self.token.kind() == 'ID', f'<Expected "ID" instead found {self.token.kind()}>'
-        self.match('ID')
-        self.match(':=')
-        self.expr()
+        values.append(self.match('ID'))
+        values.append(self.match(':='))
+        values.append(self.expr())
+        return values
 
     def conditional_statement(self):
         """
         ConditionalStatement  =  "if"  Expression  "then"  Body  [ "else" Body ]  "fi"
         """
-        self.match('if')
-        self.expr()
-        self.match('then')
-        self.body()
+        values = [self.match('if'), self.expr(), self.match('then'), self.body()]
         if self.token.kind() == 'else':
+            values.append({
+                'type': self.token.type_,
+                'position': self.token.position_,
+                'value': self.token.value_
+            })
             self.token = self.lex.next()
-            self.body()
-        prev_token = self.token
+            values.append(self.body())
         self.match('fi')
-        next_token = self.token
-        if next_token.kind() == ';':
-            self.token = next_token
-        else:
-            raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 2}). '
-                            f'Expected ";" but none found.>')
 
     def expr(self):
         """
         Expression  =  SimpleExpression [ RelationalOperator SimpleExpression ]
         RelationalOperator  =  "<" | "=<" | "=" | "!=" | ">=" | ">"
         """
-        self.simple_expr()
+        # value = self.simple_expr()
+        value = {
+            'type': "Expression",
+            'value': self.simple_expr()
+        }
         if self.token.kind() in ('<', '>', '<=', '>=', '!=', '='):
             self.token = self.lex.next()
-            self.simple_expr()
+            # value = self.simple_expr()
+            value = {
+                'type': "Expression",
+                'value': self.simple_expr()
+            }
+        return value
 
     def simple_expr(self):
         """
         SimpleExpression  =  Term { AdditiveOperator Term }
         AdditiveOperator  =  "+" | "-" | "or"
         """
-        self.term()
+        value = self.term()
         while self.token.kind() in ('+', '-', 'or'):
             self.token = self.lex.next()
-            self.term()
+            value = self.term()
+        return value
 
     def term(self):
         """
         Term  =  Factor { MultiplicativeOperator Factor }
         MultiplicativeOperator  =  "*" | "/" | "and"
         """
-        self.factor()
+        value = self.factor()
         while self.token.kind() in ('*', '/', 'and'):
             self.token = self.lex.next()
-            self.factor()
+            value = self.factor()
+        return value
 
     def factor(self):
         """
         Factor  =  [ UnaryOperator ] ( Literal  |  Identifier  | "(" Expression ")" )
         UnaryOperator  =  "-" | "not"
         """
+        values = []
         if self.token.kind() in ('-', 'not'):
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
             self.token = self.lex.next()
         if self.token.kind() in ('true', 'false', 'NUM'):
-            self.literal()
+            values = self.literal()
         elif self.token.kind() == 'ID':
-            prev_token = self.token
-            next_token = self.lex.next()
-            if next_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
-                                     '+', '-', 'or', '*', '/', 'and', ')',
-                                     'else', 'do', 'od', 'fi'):
-                self.token = next_token
-            else:
-                raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 1}). '
-                                f'Expected ";" but none found.>')
-        elif self.token.kind() == '(':
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
             self.token = self.lex.next()
-            self.expr()
-            self.match(')')
+        elif self.token.kind() == '(':
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
+            self.token = self.lex.next()
+            values.append(self.expr())
+            values.append(self.match(')'))
         else:
             self.expected(['true', 'false', 'NUM', 'ID', '('])
+        return values
 
     def literal(self):
         """
         Literal  =  BooleanLiteral  |  IntegerLiteral
         IntegerLiteral  =  Digit { Digit } <-- handled by lexer
         """
+        values = []
         assert self.token.kind() in ('true', 'false', 'NUM'), \
             f'<ERROR! at {self.token.position()}.' \
             f'Expected "true" or "false" or "NUM" instead' \
             f'found {self.token.kind()}>'
         if self.token.kind() == 'NUM':
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
             prev_token = self.token
             next_token = self.lex.next()
             if next_token.kind() in (";", '<', '>', '<=', '>=', '!=', '=',
                                      '+', '-', 'or', '*', '/', 'and', ')',
-                                     'do', 'od', 'fi'):
+                                     'do', 'od', 'fi', 'then'):
                 self.token = next_token
             else:
                 raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 1}). '
                                 f'Expected ";" but none found.>')
         else:
             self.boolean_literal()
+        return values
 
     def boolean_literal(self):
         """
         BooleanLiteral  =  "false"  |  "true"
         """
+        values = []
         if self.token.kind() in ('true ', 'false'):
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
             self.token = self.lex.next()
         else:
             raise Exception(f'<ERROR! at {self.token.position()}. Expected "true" or "false" or "NUM" '
                             f'instead found {self.token.kind()}>')
+        return values
 
     def iterative_statement(self):
         """
         IterativeStatement  =  "while"  Expression  "do"  Body  "od"
         """
-        self.match('while')
-        self.expr()
-        self.match('do')
-        self.body()
+        values = []
+        values.append(self.match('while'))
+        values.append(self.expr())
+        values.append(self.match('do'))
+        values.append(self.body())
         prev_token = self.token
-        self.match('od')
+        values.append(self.match('od'))
         next_token = self.token
         if next_token.kind() == ';':
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
             self.token = next_token
         else:
             raise Exception(f'<ERROR! at (Line: {prev_token.line}, Pos: {prev_token.position_ + 2}). '
                             f'Expected ";" but none found.>')
+        return values
 
     def print_statement(self):
         """
         PrintStatement  =  "print"  Expression
         """
+        values = []
         if self.token.kind() == 'print':
+            values.append({
+                "type": self.token.type_,
+                "position": self.token.position_,
+                "value": self.token.value_
+            })
             self.token = self.lex.next()
             self.expr()
+        return values
