@@ -44,7 +44,7 @@ def main():
     # while True:  # uncomment and wrap all the code segment below for repeated filename input
     # filename = input('\nEnter filename: ')  # uncomment this and replace string below with 'filename' for input
 
-    with open(os.path.join(sys.path[0], 'test cases\\b.txt')) as file:  # change input file here manually
+    with open(os.path.join(sys.path[0], 'examples\\if.txt')) as file:  # change input file here manually
         text = file.read()
 
     start_time = time.time()
