@@ -1,4 +1,4 @@
-# Python-Compiler
+# Python-Lexer-and-Parser
 This is a project to create a compiler using python without using libraries like 're'.
 
 Project information is in its respective folder.
