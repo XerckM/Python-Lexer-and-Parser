@@ -52,7 +52,7 @@ MultiplicativeOperator  =  "*" \| "/" \| "and" .
 
 Factor  =  [ UnaryOperator ] ( Literal  \|  Identifier  \| "(" Expression ")" ) .
 
-UnaryOperator  =  "-" | "not" .
+UnaryOperator  =  "-" \| "not" .
 
 
 Literal  =  BooleanLiteral  \|  IntegerLiteral .
