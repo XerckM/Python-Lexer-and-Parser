@@ -18,14 +18,14 @@ Body  =  [ Declarations ]  Statements .
 
 Declarations  =  Declaration { Declaration } .
 
-Declaration  =  ( "bool" | "int" )  Identifier ";" .
+Declaration  =  ( "bool" \| "int" )  Identifier ";" .
 
 Statements  =  Statement { ";" Statement } .
 
 Statement  =  AssignmentStatement
-           |  ConditionalStatement
-           |  IterativeStatement
-           |  PrintStatement .
+           \|  ConditionalStatement
+           \|  IterativeStatement
+           \|  PrintStatement .
 
 AssignmentStatement  =  Identifier ":=" Expression .
 
@@ -40,37 +40,37 @@ PrintStatement  =  "print"  Expression .
 
 Expression  =  SimpleExpression [ RelationalOperator SimpleExpression ] .
 
-RelationalOperator  =  "<" | "=<" | "=" | "!=" | ">=" | ">" .
+RelationalOperator  =  "<" \| "=<" \| "=" \| "!=" \| ">=" \| ">" .
 
 SimpleExpression  =  Term { AdditiveOperator Term } .
 
-AdditiveOperator  =  "+" | "-" | "or" .
+AdditiveOperator  =  "+" \| "-" \| "or" .
 
 Term  =  Factor { MultiplicativeOperator Factor } .
 
-MultiplicativeOperator  =  "*" | "/" | "and" .
+MultiplicativeOperator  =  "*" \| "/" \| "and" .
 
-Factor  =  [ UnaryOperator ] ( Literal  |  Identifier  | "(" Expression ")" ) .
+Factor  =  [ UnaryOperator ] ( Literal  \|  Identifier  \| "(" Expression ")" ) .
 
 UnaryOperator  =  "-" | "not" .
 
 
-Literal  =  BooleanLiteral  |  IntegerLiteral .
+Literal  =  BooleanLiteral  \|  IntegerLiteral .
 
-BooleanLiteral  =  "false"  |  "true" .
+BooleanLiteral  =  "false"  \|  "true" .
 
 IntegerLiteral  =  Digit { Digit } .
 
-Identifier  =  Letter { Letter | Digit | "_" }.
+Identifier  =  Letter { Letter \| Digit \| "_" }.
 
-Digit  =  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
+Digit  =  "0" \| "1" \| "2" \| "3" \| "4" \| "5" \| "6" \| "7" \| "8" \| "9" .
 
-Letter  = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k"
-        | "l" | "m" | "n" | "o" | "p" | "q" | "u" | "r" | "s" | "t" | "u"
-        | "v" | "w" | "x" | "y" | "z"
-        | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K"
-        | "L" | "M" | "N" | "O" | "P" | "Q" | "U" | "R" | "S" | "T" | "U"
-        | "V" | "W" | "X" | "Y" | "Z" .
+Letter  = "a" \| "b" \| "c" \| "d" \| "e" \| "f" \| "g" \| "h" \| "i" \| "j" \| "k"
+        \| "l" \| "m" \| "n" \| "o" \| "p" \| "q" \| "u" \| "r" \| "s" \| "t" \| "u"
+        \| "v" \| "w" \| "x" \| "y" \| "z"
+        \| "A" \| "B" \| "C" \| "D" \| "E" \| "F" \| "G" \| "H" \| "I" \| "J" \| "K"
+        \| "L" \| "M" \| "N" \| "O" \| "P" \| "Q" \| "U" \| "R" \| "S" \| "T" \| "U"
+        \| "V" \| "W" \| "X" \| "Y" \| "Z" .
 
 
 Comments:
