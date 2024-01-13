@@ -1,89 +1,30 @@
-# Python-Lexer-and-Parser
-This is a project to create a lexer and parser using python without using libraries like 're'.
+# Python Lexer and Parser
 
-Project information is in its respective folder.
+Welcome to the Python Lexer and Parser repository! This project is dedicated to creating a lexer and parser for a mini-language using Python, without relying on external libraries like 're'.
 
-This project is for learning purposes only.
+## Overview
 
-Project is written in Python 3.10 (to work with match case)
+This repository contains a custom lexer and parser designed to interpret a simplified programming language. The project is implemented in Python 3.10, leveraging the match case feature. It's an excellent resource for learning about lexical analysis and parsing in compiler design.
 
-The syntax
-----------
+## Features
 
-Program  =  "program"  Identifier  ":"  Body  "end" .
+- **Custom Lexer**: A lexer that tokenizes input based on predefined rules, without using regular expressions.
+- **Custom Parser**: A parser that analyzes the tokenized input to understand its structure and syntax.
+- **Mini-Language Syntax**: A defined syntax for a mini-language, including basic programming constructs like variables, conditionals, and loops.
+- **Error Handling**: Custom error handling to manage illegal characters and syntax errors.
+- **Example Programs**: Sample programs in the mini-language to demonstrate the lexer and parser in action.
 
-Body  =  [ Declarations ]  Statements .
+## Installation and Usage
 
-Declarations  =  Declaration { Declaration } .
+1. Clone the repository to your local machine.
+2. Ensure you have Python 3.10 installed.
+3. Navigate to the 'Python Mini-Language' directory.
+4. Run `main.py` to execute the lexer and parser on the provided examples.
 
-Declaration  =  ( "bool" \| "int" )  Identifier ";" .
+## Contributing
 
-Statements  =  Statement { ";" Statement } .
+Contributions to the Python Lexer and Parser are welcome! Feel free to fork the repository, make changes, and submit pull requests. If you have ideas for new features or improvements, don't hesitate to open an issue.
 
-Statement  =  AssignmentStatement
-           \|  ConditionalStatement
-           \|  IterativeStatement
-           \|  PrintStatement .
+## License
 
-AssignmentStatement  =  Identifier ":=" Expression .
-
-ConditionalStatement  =  "if"  Expression
-                         "then"  Body
-                         [ "else" Body ]
-                         "fi" .
-
-IterativeStatement  =  "while"  Expression  "do"  Body  "od" .
-
-PrintStatement  =  "print"  Expression .
-
-Expression  =  SimpleExpression [ RelationalOperator SimpleExpression ] .
-
-RelationalOperator  =  "<" \| "=<" \| "=" \| "!=" \| ">=" \| ">" .
-
-SimpleExpression  =  Term { AdditiveOperator Term } .
-
-AdditiveOperator  =  "+" \| "-" \| "or" .
-
-Term  =  Factor { MultiplicativeOperator Factor } .
-
-MultiplicativeOperator  =  "*" \| "/" \| "and" .
-
-Factor  =  [ UnaryOperator ] ( Literal  \|  Identifier  \| "(" Expression ")" ) .
-
-UnaryOperator  =  "-" \| "not" .
-
-
-Literal  =  BooleanLiteral  \|  IntegerLiteral .
-
-BooleanLiteral  =  "false"  \|  "true" .
-
-IntegerLiteral  =  Digit { Digit } .
-
-Identifier  =  Letter { Letter \| Digit \| "_" }.
-
-Digit  =  "0" \| "1" \| "2" \| "3" \| "4" \| "5" \| "6" \| "7" \| "8" \| "9" .
-
-Letter  = "a" \| "b" \| "c" \| "d" \| "e" \| "f" \| "g" \| "h" \| "i" \| "j" \| "k"
-        \| "l" \| "m" \| "n" \| "o" \| "p" \| "q" \| "u" \| "r" \| "s" \| "t" \| "u"
-        \| "v" \| "w" \| "x" \| "y" \| "z"
-        \| "A" \| "B" \| "C" \| "D" \| "E" \| "F" \| "G" \| "H" \| "I" \| "J" \| "K"
-        \| "L" \| "M" \| "N" \| "O" \| "P" \| "Q" \| "U" \| "R" \| "S" \| "T" \| "U"
-        \| "V" \| "W" \| "X" \| "Y" \| "Z" .
-
-
-Comments:
---------
-
-0.  Integer literals and identifiers are treated as terminal symbols.
-
-1.  White space is allowed anywhere, except within terminal symbols.
-
-1.  A comment begins with a double slash ("//") and terminates at the end of
-    the line.
-
-2.  "Maximum munch" applies. For example, "if1" is an identifier, not an "if"
-    followed by a "1".
-
-3.  The scope of a variable is from its declaration to the end of the nearest
-    enclosing body.  Standard rules for hiding apply.
-
+This project is licensed under the MIT License - see the LICENSE file for details.
